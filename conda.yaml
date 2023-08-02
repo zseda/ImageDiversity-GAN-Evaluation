@@ -1,0 +1,26 @@
+name: my_env
+channels:
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.8
+  - pytorch=1.10.0
+  - torchvision=0.11.1
+  - torchaudio=0.10.0
+  - cudatoolkit=11.1
+  - tqdm
+  - ninja
+  - h5py
+  - kornia
+  - matplotlib
+  - pandas
+  - scikit-learn
+  - scipy
+  - seaborn
+  - wandb
+  - PyYAML
+  - click
+  - requests
+  - pyspng
+  - imageio-ffmpeg
+  - timm
