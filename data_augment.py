@@ -53,7 +53,7 @@ def save_and_log_image(image, image_augmented, i, j):
 
 # Save augmented images and log to wandb
 with ThreadPoolExecutor() as executor:
-    for (images, _), (images_augmented, _) in zip(dataloader_original, dataloader_augmented):
+    for i, ((images, _), (images_augmented, _)) in enumerate(zip(dataloader_original, dataloader_augmented)):
         for j, (image, image_augmented) in enumerate(zip(images, images_augmented)):
             executor.submit(save_and_log_image, image, image_augmented, i, j)
 
