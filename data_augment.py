@@ -15,10 +15,6 @@ wandb.config.update({"AutoAugment Policy": "CIFAR10"})
 # Initialize device
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-# Create directory to save augmented images
-save_dir = Path("CIFAR10_augmented")
-save_dir.mkdir(parents=True, exist_ok=True)
-
 # Define AutoAugment transform
 autoaugment_transform = transforms.AutoAugment(policy=transforms.AutoAugmentPolicy.CIFAR10)
 
@@ -33,32 +29,25 @@ transform_original = transforms.Compose([
     transforms.ToTensor(),
 ])
 
-# Seed for reproducibility
-seed = 42
-torch.manual_seed(seed)
-
 # Load CIFAR-10 dataset with augmented transforms
 dataset_augmented = CIFAR10(root="./data", train=True, download=True, transform=transform_augmented)
-dataloader_augmented = DataLoader(dataset_augmented, batch_size=8, shuffle=False)
+dataloader_augmented = DataLoader(dataset_augmented, batch_size=10, shuffle=False)
 
 # Load CIFAR-10 dataset with original transforms
 dataset_original = CIFAR10(root="./data", train=True, download=True, transform=transform_original)
-dataloader_original = DataLoader(dataset_original, batch_size=8, shuffle=False)
+dataloader_original = DataLoader(dataset_original, batch_size=10, shuffle=False)
 
-# Function to log image
-def log_image(image, image_augmented, i):
-    wandb.log({
-        "Original Image": [wandb.Image(transforms.ToPILImage()(image), caption=f"Original {i}")],
-        "Augmented Image": [wandb.Image(transforms.ToPILImage()(image_augmented), caption=f"Augmented {i}")]
-    })
+# Log first 10 original and augmented images
+original_images = next(iter(dataloader_original))[0]
+augmented_images = next(iter(dataloader_augmented))[0]
 
-# Log images to wandb
-for i, ((images, _), (images_augmented, _)) in enumerate(zip(dataloader_original, dataloader_augmented)):
-    for j, (image, image_augmented) in enumerate(zip(images, images_augmented)):
-        log_image(image, image_augmented, f"{i*8 + j}")
+wandb.log({
+    "Original Images": [wandb.Image(transforms.ToPILImage()(img), caption=f"Original {i+1}") for i, img in enumerate(original_images)],
+    "Augmented Images": [wandb.Image(transforms.ToPILImage()(img), caption=f"Augmented {i+1}") for i, img in enumerate(augmented_images)]
+})
 
-# Log augmented images to wandb
-wandb.save(str(save_dir / "*"))
+# Note on AutoAugment
+wandb.log({"Note": "AutoAugment with CIFAR10 policy was used, but specific augmentations are not available."})
 
 # Close the wandb run
 wandb.finish()
