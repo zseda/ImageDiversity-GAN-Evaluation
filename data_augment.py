@@ -33,34 +33,29 @@ transform_original = transforms.Compose([
     transforms.ToTensor(),
 ])
 
+# Seed for reproducibility
+seed = 42
+torch.manual_seed(seed)
+
 # Load CIFAR-10 dataset with augmented transforms
 dataset_augmented = CIFAR10(root="./data", train=True, download=True, transform=transform_augmented)
-dataloader_augmented = DataLoader(dataset_augmented, batch_size=10, shuffle=True)
+dataloader_augmented = DataLoader(dataset_augmented, batch_size=8, shuffle=False)
 
 # Load CIFAR-10 dataset with original transforms
 dataset_original = CIFAR10(root="./data", train=True, download=True, transform=transform_original)
-dataloader_original = DataLoader(dataset_original, batch_size=10, shuffle=True)
+dataloader_original = DataLoader(dataset_original, batch_size=8, shuffle=False)
 
-# Function to save and log image
-def save_and_log_image(image, image_augmented, i, j):
-    image_path = save_dir / f"{i}_{j}.png"
-    transforms.ToPILImage()(image_augmented).save(image_path)
+# Function to log image
+def log_image(image, image_augmented, i):
     wandb.log({
-        "Original Images": [wandb.Image(transforms.ToPILImage()(image), caption=f"Original {i}_{j}")],
-        "Augmented Images": [wandb.Image(transforms.ToPILImage()(image_augmented), caption=f"Augmented {i}_{j}")]
+        "Original Image": [wandb.Image(transforms.ToPILImage()(image), caption=f"Original {i}")],
+        "Augmented Image": [wandb.Image(transforms.ToPILImage()(image_augmented), caption=f"Augmented {i}")]
     })
 
-# Save augmented images and log to wandb
+# Log images to wandb
 for i, ((images, _), (images_augmented, _)) in enumerate(zip(dataloader_original, dataloader_augmented)):
-    original_images_batch = []
-    augmented_images_batch = []
     for j, (image, image_augmented) in enumerate(zip(images, images_augmented)):
-        original_images_batch.append(wandb.Image(transforms.ToPILImage()(image), caption=f"Original {i}_{j}"))
-        augmented_images_batch.append(wandb.Image(transforms.ToPILImage()(image_augmented), caption=f"Augmented {i}_{j}"))
-    wandb.log({
-        "Original Images": original_images_batch,
-        "Augmented Images": augmented_images_batch
-    })
+        log_image(image, image_augmented, f"{i*8 + j}")
 
 # Log augmented images to wandb
 wandb.save(str(save_dir / "*"))
