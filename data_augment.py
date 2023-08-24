@@ -10,6 +10,9 @@ import wandb
 # Initialize wandb
 wandb.init(project="cifar10_autoaugment")
 
+# Log the AutoAugment policy used
+wandb.config.update({"AutoAugment Policy": "CIFAR10"})
+
 # Initialize device
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -20,30 +23,39 @@ save_dir.mkdir(parents=True, exist_ok=True)
 # Define AutoAugment transform
 autoaugment_transform = transforms.AutoAugment(policy=transforms.AutoAugmentPolicy.CIFAR10)
 
-# Compose transforms
-transform = transforms.Compose([
-    transforms.ToPILImage(),
+# Compose transforms for augmented images
+transform_augmented = transforms.Compose([
     autoaugment_transform,
     transforms.ToTensor(),
 ])
 
-# Load CIFAR-10 dataset
-dataset = CIFAR10(root="./data", train=True, download=True, transform=transform)
-dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
+# Compose transforms for original images
+transform_original = transforms.Compose([
+    transforms.ToTensor(),
+])
 
-# Function to save image
-def save_image(image, i, j):
-    image = image.to(device)  # Move image to GPU
+# Load CIFAR-10 dataset with augmented transforms
+dataset_augmented = CIFAR10(root="./data", train=True, download=True, transform=transform_augmented)
+dataloader_augmented = DataLoader(dataset_augmented, batch_size=32, shuffle=True)
+
+# Load CIFAR-10 dataset with original transforms
+dataset_original = CIFAR10(root="./data", train=True, download=True, transform=transform_original)
+dataloader_original = DataLoader(dataset_original, batch_size=32, shuffle=True)
+
+# Function to save and log image
+def save_and_log_image(image, image_augmented, i, j):
     image_path = save_dir / f"{i}_{j}.png"
-    transforms.ToPILImage()(image.cpu()).save(image_path)  # Move image back to CPU for saving
+    transforms.ToPILImage()(image_augmented).save(image_path)
+    wandb.log({
+        "Original Images": [wandb.Image(transforms.ToPILImage()(image), caption=f"Original {i}_{j}")],
+        "Augmented Images": [wandb.Image(image_path, caption=f"Augmented {i}_{j}")]
+    })
 
 # Save augmented images and log to wandb
 with ThreadPoolExecutor() as executor:
-    for i, (images, _) in enumerate(dataloader):
-        images = images.to(device)  # Move batch of images to GPU
-        for j, image in enumerate(images):
-            executor.submit(save_image, image, i, j)
+    for (images, _), (images_augmented, _) in zip(dataloader_original, dataloader_augmented):
+        for j, (image, image_augmented) in enumerate(zip(images, images_augmented)):
+            executor.submit(save_and_log_image, image, image_augmented, i, j)
 
 # Log augmented images to wandb
 wandb.save(str(save_dir / "*"))
-
