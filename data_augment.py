@@ -5,6 +5,8 @@ from torchvision.datasets import CIFAR10
 from torch.utils.data import DataLoader
 from pathlib import Path
 import wandb
+import numpy as np
+from PIL import Image
 
 # Initialize wandb
 wandb.init(project="cifar10_autoaugment")
@@ -35,51 +37,32 @@ transform_original = transforms.Compose([
 
 # Load CIFAR-10 dataset with augmented transforms
 dataset_augmented = CIFAR10(root="./data", train=True, download=True, transform=transform_augmented)
-dataloader_augmented = DataLoader(dataset_augmented, batch_size=1, shuffle=False)
+dataloader_augmented = DataLoader(dataset_augmented, batch_size=10, shuffle=True)
 
 # Load CIFAR-10 dataset with original transforms
 dataset_original = CIFAR10(root="./data", train=True, download=True, transform=transform_original)
-dataloader_original = DataLoader(dataset_original, batch_size=1, shuffle=False)
-
-# Initialize counter
-counter = 0
-
-# Initialize lists to hold batch of images
-original_images_batch = []
-augmented_images_batch = []
+dataloader_original = DataLoader(dataset_original, batch_size=10, shuffle=True)
 
 # Function to save and log image
-def save_and_log_image(image, image_augmented, counter):
-    image_path = save_dir / f"{counter}.png"
-    transforms.ToPILImage()(image_augmented).save(image_path)
-    original_images_batch.append(wandb.Image(transforms.ToPILImage()(image), caption=f"Original {counter}"))
-    augmented_images_batch.append(wandb.Image(image_path, caption=f"Augmented {counter}"))
-
-# Loop through the dataset
-for (image, _), (image_augmented, _) in zip(dataloader_original, dataloader_augmented):
-    counter += 1
-    save_and_log_image(image.squeeze(0), image_augmented.squeeze(0), counter)
-
-    # Log every 10 images
-    if counter % 10 == 0:
-        wandb.log({
-            "Original Images": original_images_batch,
-            "Augmented Images": augmented_images_batch
-        })
-        # Clear the batch lists
-        original_images_batch.clear()
-        augmented_images_batch.clear()
-        # Log any remaining images in the batch lists
-
-if original_images_batch or augmented_images_batch:
+def save_and_log_image(image, image_augmented, i, j):
+    image_path = save_dir / f"{i}_{j}.png"
+    pil_image = transforms.ToPILImage()(image_augmented)
+    pil_image.save(image_path)
+    
+    # Convert PIL Image to numpy array
+    np_image = np.array(pil_image)
+    
     wandb.log({
-        "Original Images": original_images_batch,
-        "Augmented Images": augmented_images_batch
+        "Original Images": [wandb.Image(transforms.ToPILImage()(image), caption=f"Original {i}_{j}")],
+        "Augmented Images": [wandb.Image(np_image, caption=f"Augmented {i}_{j}")]
     })
 
-# Save augmented images to directory
+# Save augmented images and log to wandb
+for i, ((images, _), (images_augmented, _)) in enumerate(zip(dataloader_original, dataloader_augmented)):
+    for j, (image, image_augmented) in enumerate(zip(images, images_augmented)):
+        save_and_log_image(image, image_augmented, i, j)
+    if i == 9:  # Stop after logging 100 images (10 batches of 10)
+        break
+
+# Log augmented images to wandb
 wandb.save(str(save_dir / "*"))
-
-# Finish the Wandb run
-wandb.finish()
-

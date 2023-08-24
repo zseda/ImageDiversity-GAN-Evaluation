@@ -9,3 +9,4 @@ dependencies:
   - wandb
   - pathlib
   - pillow
+  - numpy
