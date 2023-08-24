@@ -42,14 +42,28 @@ dataloader_augmented = DataLoader(dataset_augmented, batch_size=32, shuffle=True
 dataset_original = CIFAR10(root="./data", train=True, download=True, transform=transform_original)
 dataloader_original = DataLoader(dataset_original, batch_size=32, shuffle=True)
 
+# Initialize lists to hold batch of images
+original_images_batch = []
+augmented_images_batch = []
+
 # Function to save and log image
 def save_and_log_image(image, image_augmented, i, j):
     image_path = save_dir / f"{i}_{j}.png"
     transforms.ToPILImage()(image_augmented).save(image_path)
-    wandb.log({
-        "Original Images": [wandb.Image(transforms.ToPILImage()(image), caption=f"Original {i}_{j}")],
-        "Augmented Images": [wandb.Image(image_path, caption=f"Augmented {i}_{j}")]
-    })
+    
+    # Add to batch
+    original_images_batch.append(wandb.Image(transforms.ToPILImage()(image), caption=f"Original {i}_{j}"))
+    augmented_images_batch.append(wandb.Image(image_path, caption=f"Augmented {i}_{j}"))
+
+    # Log if batch size is reached
+    if len(original_images_batch) >= 10:  # Adjust batch size as needed
+        wandb.log({
+            "Original Images": original_images_batch,
+            "Augmented Images": augmented_images_batch
+        })
+        # Clear the batches
+        original_images_batch.clear()
+        augmented_images_batch.clear()
 
 # Save augmented images and log to wandb
 with ThreadPoolExecutor() as executor:
