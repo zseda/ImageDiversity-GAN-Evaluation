@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader
 from pathlib import Path
 import wandb
 import time
+from PIL import Image
 
 # Initialize wandb
 wandb.init(project="cifar10_autoaugment")
@@ -50,8 +51,15 @@ augmented_images_batch = []
 def save_and_log_image(image, image_augmented, i, j):
     image_path = save_dir / f"{i}_{j}.png"
     transforms.ToPILImage()(image_augmented).save(image_path)
-    original_images_batch.append(wandb.Image(transforms.ToPILImage()(image), caption=f"Original {i}_{j}"))
-    augmented_images_batch.append(wandb.Image(image_path, caption=f"Augmented {i}_{j}"))
+    
+    # Load the image from the path as a PIL Image
+    pil_image = Image.open(image_path)
+    
+    wandb.log({
+        "Original Images": [wandb.Image(transforms.ToPILImage()(image), caption=f"Original {i}_{j}")],
+        "Augmented Images": [wandb.Image(pil_image, caption=f"Augmented {i}_{j}")]
+    })
+
 
 # Log images to Wandb in batches
 def log_images_to_wandb():
