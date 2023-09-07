@@ -12,4 +12,5 @@ wandb/
 test/
 *.csv
 *.npy
-
+*.png
+CIFAR10_augmented/
