@@ -1,7 +1,7 @@
 version: "2.3"
 services:
   studiogan:
-    image: alex4727/experiment:pytorch113_cuda116
+    image: stylegan2
     container_name: StudioGAN
     runtime: nvidia
     shm_size: '128g'
