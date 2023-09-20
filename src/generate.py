@@ -3,8 +3,9 @@ import wandb
 from PIL import Image
 import zipfile
 import typer
-from models.stylegan2 import Generator  # Import your Generator class from stylegan2.py
-from pathlib import Path  # Import pathlib for file and directory operations
+from models.stylegan2 import Generator
+from pathlib import Path
+import config
 
 app = typer.Typer()
 
@@ -79,9 +80,16 @@ def main(
     num_images: int = 50000,
     image_size: int = 32,  # (32 for CIFAR-10)
     zip_path: str = "generated_images.zip",  # Path to the zip file
+    cfg_file: str = "src/configs/CIFAR10/StyleGAN2.yaml",
 ):
+    cfgs = config.Configurations(cfg_file)
     generator = Generator(
-        z_dim=512, c_dim=0, w_dim=512, img_resolution=1024, img_channels=3, MODEL=None
+        z_dim=512,
+        c_dim=10,
+        w_dim=512,
+        img_resolution=32,
+        img_channels=3,
+        MODEL=cfgs.MODEL,
     )
     generator = load_generator(generator, checkpoint_path)
 
