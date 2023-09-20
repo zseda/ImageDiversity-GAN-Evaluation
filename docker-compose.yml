@@ -1,4 +1,4 @@
-version: "3.3"
+version: "2.7"
 services:
   studiogan:
     image: alex4727/experiment:pytorch113_cuda116
