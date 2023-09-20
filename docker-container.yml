@@ -7,7 +7,7 @@ services:
     shm_size: '128g'
     volumes:
       - /data/1birinci/ImageDiversity-GAN-Evaluation:/root/code
-      - ~/data/birinci/data/generated_images:/root/code/generated_images
+      - /data/birinci/data/generated_images:/root/code/generated_images
     working_dir: /root/code
     environment:
       WANDB_API_KEY: api_key
