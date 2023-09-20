@@ -34,7 +34,7 @@ def generate_and_zip_images(
         )  # Use the desired image size
 
     # Define the directory to save generated images
-    save_dir = Path.home() / "data-fast" / "birinci" / "data" / "generated_images"
+    save_dir = Path.home() / "data-fast2" / "birinci" / "data" / "generated_images"
     save_dir.mkdir(parents=True, exist_ok=True)
 
     # Create a zip file to store the images
@@ -76,7 +76,7 @@ def log_images_to_wandb(images, num_images):
 
 @app.command()
 def main(
-    checkpoint_path: str = "/data-fast/birinci/checkpoints/model=G-best-weights-step=178000.pth",
+    checkpoint_path: str = "/data-fast2/birinci/checkpoints/model=G-best-weights-step=178000.pth",
     num_images: int = 50000,
     image_size: int = 32,  # (32 for CIFAR-10)
     zip_path: str = "generated_images.zip",  # Path to the zip file
