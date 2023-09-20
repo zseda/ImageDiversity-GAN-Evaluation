@@ -11,5 +11,5 @@ services:
     working_dir: /root/code
     environment:
       WANDB_API_KEY: api_key
-    command: python src/generate.py --cfg src/configs/CIFAR10/StyleGAN2.yaml --output_dir generated_images
+    command: python src/generate.py
 
