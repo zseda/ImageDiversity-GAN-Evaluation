@@ -4,7 +4,7 @@ import wandb
 from PIL import Image
 import zipfile
 import typer
-from stylegan2 import Generator  # Import your Generator class from stylegan2.py
+from models.stylegan2 import Generator  # Import your Generator class from stylegan2.py
 from pathlib import Path  # Import pathlib for file and directory operations
 
 app = typer.Typer()
@@ -34,10 +34,11 @@ def generate_and_zip_images(
         )  # Use the desired image size
 
     # Define the directory to save generated images
-    save_dir = Path.home() / "data" / "birinci" / "repo" / "generated_images"
+    save_dir = Path.home() / "data-fast" / "birinci" / "data" / "generated_images"
     save_dir.mkdir(parents=True, exist_ok=True)
 
     # Create a zip file to store the images
+    zip_path = save_dir / zip_path
     with zipfile.ZipFile(zip_path, "w") as zipf:
         for i in range(num_images):
             img = images[i].cpu().numpy().transpose(1, 2, 0)  # Convert to numpy format
@@ -45,12 +46,15 @@ def generate_and_zip_images(
             img = Image.fromarray(img)  # Convert to PIL Image
             img_path = save_dir / f"image_{i}.png"
             img.save(img_path)  # Save the image
-            zipf.write(img_path, os.path.basename(img_path))
+            zipf.write(img_path, img_path.name)
 
 
 # Function to log images to WandB
 def log_images_to_wandb(images, num_images):
-    wandb.init(project="your_project_name", entity="your_entity_name")
+    wandb.init(
+        project="generate synthetics images with stylegan2",
+        entity="Image Diversity Gan Evaluation",
+    )
 
     for i in range(0, num_images, 10):
         image_group = [
@@ -72,9 +76,9 @@ def log_images_to_wandb(images, num_images):
 
 @app.command()
 def main(
-    checkpoint_path: str = "path/to/your/checkpoint.pth",  # Replace with the actual path to your checkpoint
-    num_images: int = 100,  # Change this to the number of images you want to generate
-    image_size: int = 32,  # Set the desired image size here (e.g., 32 for CIFAR-10)
+    checkpoint_path: str = "/data-fast/birinci/checkpoints/model=G-best-weights-step=178000.pth",
+    num_images: int = 50000,
+    image_size: int = 32,  # (32 for CIFAR-10)
     zip_path: str = "generated_images.zip",  # Path to the zip file
 ):
     generator = Generator(
