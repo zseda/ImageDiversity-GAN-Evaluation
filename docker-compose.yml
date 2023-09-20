@@ -10,6 +10,6 @@ services:
       - /data-fast2/birinci/data/generated_images:/root/code/generated_images
     working_dir: /root/code
     environment:
-      WANDB_API_KEY: api_key
+            WANDB_API_KEY: f5215f014cf7c334360ccb51677a1e113fb5384c
     command: python src/generate.py
 

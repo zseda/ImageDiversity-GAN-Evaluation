@@ -11,4 +11,4 @@ RUN pip install pillow zipfile36 typer pathlib
 COPY . /root/code
 
 # Define the command to run your script
-CMD ["python", "src/generate_images.py"]
+CMD ["python", "src/generate.py"]
