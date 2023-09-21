@@ -5,6 +5,7 @@ services:
     build:
       context: ..
       dockerfile: docker/.Dockerfile
+    
     container_name: StudioGAN
     runtime: nvidia
     shm_size: '128g'
@@ -19,4 +20,7 @@ services:
       CFG_FILE: ${CFG_FILE}
       WANDB_API_KEY: ${WANDB_API_KEY}
       OUTPUT_DIR: ${OUTPUT_DIR}
+      USER_ID: $(id -u)
+      GROUP_ID: $(id -g)
+    user: "${USER_ID}:${GROUP_ID}"
     command: python src/generate.py
