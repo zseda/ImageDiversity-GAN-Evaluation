@@ -21,4 +21,5 @@ services:
       CFG_FILE: ${CFG_FILE}
       WANDB_API_KEY: ${WANDB_API_KEY}
       OUTPUT_DIR: ${OUTPUT_DIR}
-    command: python src/generate.py
+    #command: python src/generate.py
+    command: ls
