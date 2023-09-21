@@ -1,7 +1,6 @@
 version: "2.3"
 services:
   studiogan:
-    # image: stylegan2
     build:
       context: ..
       dockerfile: docker/.Dockerfile
@@ -10,7 +9,6 @@ services:
     runtime: nvidia
     shm_size: '128g'
     volumes:
-    #should be correct relative path
       - ../src/:/app/src
     working_dir: /app
     environment:
@@ -22,5 +20,5 @@ services:
       WANDB_API_KEY: ${WANDB_API_KEY}
       OUTPUT_DIR: ${OUTPUT_DIR}
     env_file:
-      - .env
+    - src/.env
     command: python src/generate.py
