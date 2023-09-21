@@ -20,5 +20,5 @@ services:
       WANDB_API_KEY: ${WANDB_API_KEY}
       OUTPUT_DIR: ${OUTPUT_DIR}
     env_file:
-    - /.env
+    - .env
     command: python src/generate.py
