@@ -12,13 +12,7 @@ services:
       - ../src/:/app/src
     working_dir: /app
     environment:
-      CHECKPOINT_PATH: ${CHECKPOINT_PATH}
-      NUM_IMAGES: ${NUM_IMAGES}
-      IMAGE_SIZE: ${IMAGE_SIZE}
-      ZIP_PATH: ${ZIP_PATH}
-      CFG_FILE: ${CFG_FILE}
       WANDB_API_KEY: ${WANDB_API_KEY}
-      OUTPUT_DIR: ${OUTPUT_DIR}
     env_file:
     - .env
     command: python src/generate.py
