@@ -5,7 +5,7 @@ FROM alex4727/experiment:pytorch113_cuda116
 WORKDIR /app
 
 # Install additional Python libraries using pip
-RUN pip install pillow zipfile36 typer pathlib decouple
+RUN pip install pillow zipfile36 typer pathlib python-decouple
 
 # Copy your source code to the container
 # COPY src/ /app
