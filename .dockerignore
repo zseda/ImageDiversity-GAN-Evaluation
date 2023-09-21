@@ -1,0 +1,12 @@
+.vscode/
+.git/
+
+logs/
+docs/
+data/
+CIFAR10_augmented/
+wandb/
+
+.gitignore
+LICENSE
+LICENSE-NVIDIA

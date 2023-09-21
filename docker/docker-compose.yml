@@ -1,0 +1,22 @@
+version: "2.3"
+services:
+  studiogan:
+    # image: stylegan2
+    build:
+      context: ..
+      dockerfile: docker/.Dockerfile
+    container_name: StudioGAN
+    runtime: nvidia
+    shm_size: '128g'
+    # volumes:
+      # - /data-fast2/birinci/ImageDiversity-GAN-Evaluation:/root/code
+      # - /data-fast2/birinci/data/generated_images:/root/code/generated_images
+    working_dir: /app
+    environment:
+      CHECKPOINT_PATH: ${CHECKPOINT_PATH}
+      NUM_IMAGES: ${NUM_IMAGES}
+      IMAGE_SIZE: ${IMAGE_SIZE}
+      ZIP_PATH: ${ZIP_PATH}
+      CFG_FILE: ${CFG_FILE}
+      WANDB_API_KEY: ${WANDB_API_KEY}
+    command: python src/generate.py

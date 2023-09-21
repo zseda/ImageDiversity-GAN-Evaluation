@@ -1,0 +1,6 @@
+version: "2.3"
+services:
+  studiogan:
+    volumes:
+      - "/data-fast2/birinci/checkpoints:/app/checkpoints"
+
