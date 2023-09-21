@@ -12,6 +12,7 @@ from settings import (
     ZIP_PATH,
     CFG_FILE,
     WANDB_API_KEY,
+    OUTPUT_DIR,
 )
 
 
@@ -39,7 +40,7 @@ def generate_and_zip_images(
         )  # Use the desired image size
 
     # Create a directory for saving generated images
-    output_dir = Path("generated_images")
+    output_dir = Path(OUTPUT_DIR)
     output_dir.mkdir(exist_ok=True)
 
     # Create a zip file to store the images
