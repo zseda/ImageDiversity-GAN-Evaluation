@@ -2,12 +2,17 @@ import torch
 import wandb
 from PIL import Image
 import zipfile
-import typer
 from models.stylegan2 import Generator
 from pathlib import Path
-import config
-
-app = typer.Typer()
+import config as cfg
+from settings import (
+    CHECKPOINT_PATH,
+    NUM_IMAGES,
+    IMAGE_SIZE,
+    ZIP_PATH,
+    CFG_FILE,
+    WANDB_API_KEY,
+)
 
 
 # Function to load the generator from a checkpoint
@@ -33,8 +38,12 @@ def generate_and_zip_images(
             z, c, img_resolution=image_size
         )  # Use the desired image size
 
+    # Create a directory for saving generated images
+    output_dir = Path("generated_images")
+    output_dir.mkdir(exist_ok=True)
+
     # Create a zip file to store the images
-    with zipfile.ZipFile(zip_path, "w") as zipf:
+    with zipfile.ZipFile(output_dir / zip_path, "w") as zipf:
         for i in range(num_images):
             img = images[i].cpu().numpy().transpose(1, 2, 0)  # Convert to numpy format
             img = (img * 255).astype("uint8")  # Scale to 8-bit integer
@@ -71,16 +80,8 @@ def log_images_to_wandb(images, num_images, wandb_api_key):
     wandb.finish()
 
 
-@app.command()
-def main(
-    checkpoint_path: str = typer.Argument(..., help="Path to the checkpoint file"),
-    num_images: int = typer.Argument(..., help="Number of images to generate"),
-    image_size: int = 32,  # (32 for CIFAR-10)
-    zip_path: str = "generated_images.zip",  # Path to the zip file
-    cfg_file: str = "src/configs/CIFAR10/StyleGAN2.yaml",
-    wandb_api_key: str = typer.prompt("Enter your WandB API key: "),
-):
-    cfgs = config.Configurations(cfg_file)
+if __name__ == "__main__":
+    cfgs = cfg.Configurations(CFG_FILE)
     generator = Generator(
         z_dim=512,
         c_dim=10,
@@ -89,11 +90,7 @@ def main(
         img_channels=3,
         MODEL=cfgs.MODEL,
     )
-    generator = load_generator(generator, checkpoint_path)
+    generator = load_generator(generator, CHECKPOINT_PATH)
 
-    generate_and_zip_images(generator, num_images, image_size, zip_path)
-    log_images_to_wandb(generator, num_images, wandb_api_key)
-
-
-if __name__ == "__main__":
-    app()
+    generate_and_zip_images(generator, NUM_IMAGES, IMAGE_SIZE, ZIP_PATH)
+    log_images_to_wandb(generator, NUM_IMAGES, WANDB_API_KEY)
