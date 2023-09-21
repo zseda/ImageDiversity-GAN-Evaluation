@@ -20,7 +20,5 @@ services:
       CFG_FILE: ${CFG_FILE}
       WANDB_API_KEY: ${WANDB_API_KEY}
       OUTPUT_DIR: ${OUTPUT_DIR}
-      USER_ID: $(id -u)
-      GROUP_ID: $(id -g)
-    user: "${USER_ID}:${GROUP_ID}"
+    user: "${UID}:${GID}"
     command: python src/generate.py
