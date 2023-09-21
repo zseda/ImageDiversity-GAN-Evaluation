@@ -10,7 +10,8 @@ services:
     runtime: nvidia
     shm_size: '128g'
     volumes:
-      - src/:/app/src
+    #should be correct relative path
+      - ./src/:/app/src
     working_dir: /app
     environment:
       CHECKPOINT_PATH: ${CHECKPOINT_PATH}
