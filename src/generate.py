@@ -20,7 +20,7 @@ def load_generator(generator, checkpoint_path):
     return generator
 
 
-# Function to generate and save images
+# Function to generate and save images in a zip file
 def generate_and_zip_images(
     generator, num_images, image_size=32, zip_path="generated_images.zip"
 ):
@@ -33,27 +33,24 @@ def generate_and_zip_images(
             z, c, img_resolution=image_size
         )  # Use the desired image size
 
-    # Define the directory to save generated images
-    save_dir = Path.home() / "data-fast2" / "birinci" / "data" / "generated_images"
-    save_dir.mkdir(parents=True, exist_ok=True)
-
     # Create a zip file to store the images
-    zip_path = save_dir / zip_path
     with zipfile.ZipFile(zip_path, "w") as zipf:
         for i in range(num_images):
             img = images[i].cpu().numpy().transpose(1, 2, 0)  # Convert to numpy format
             img = (img * 255).astype("uint8")  # Scale to 8-bit integer
             img = Image.fromarray(img)  # Convert to PIL Image
-            img_path = save_dir / f"image_{i}.png"
-            img.save(img_path)  # Save the image
-            zipf.write(img_path, img_path.name)
+            img_data = img.tobytes()
+            zipf.writestr(
+                f"image_{i}.png", img_data
+            )  # Save the image data to the zip file
 
 
 # Function to log images to WandB
-def log_images_to_wandb(images, num_images):
+def log_images_to_wandb(images, num_images, wandb_api_key):
     wandb.init(
         project="generate synthetics images with stylegan2",
         entity="Image Diversity Gan Evaluation",
+        config={"wandb_api_key": wandb_api_key},  # Pass the WandB API key in the config
     )
 
     for i in range(0, num_images, 10):
@@ -76,11 +73,12 @@ def log_images_to_wandb(images, num_images):
 
 @app.command()
 def main(
-    checkpoint_path: str = "/data-fast2/birinci/checkpoints/model=G-best-weights-step=178000.pth",
-    num_images: int = 50000,
+    checkpoint_path: str = typer.Argument(..., help="Path to the checkpoint file"),
+    num_images: int = typer.Argument(..., help="Number of images to generate"),
     image_size: int = 32,  # (32 for CIFAR-10)
     zip_path: str = "generated_images.zip",  # Path to the zip file
     cfg_file: str = "src/configs/CIFAR10/StyleGAN2.yaml",
+    wandb_api_key: str = typer.prompt("Enter your WandB API key: "),
 ):
     cfgs = config.Configurations(cfg_file)
     generator = Generator(
@@ -94,7 +92,7 @@ def main(
     generator = load_generator(generator, checkpoint_path)
 
     generate_and_zip_images(generator, num_images, image_size, zip_path)
-    log_images_to_wandb(generator, num_images)
+    log_images_to_wandb(generator, num_images, wandb_api_key)
 
 
 if __name__ == "__main__":
