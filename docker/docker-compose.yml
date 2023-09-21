@@ -8,9 +8,8 @@ services:
     container_name: StudioGAN
     runtime: nvidia
     shm_size: '128g'
-    # volumes:
-      # - /data-fast2/birinci/ImageDiversity-GAN-Evaluation:/root/code
-      # - /data-fast2/birinci/data/generated_images:/root/code/generated_images
+    volumes:
+      - src/:/app/src
     working_dir: /app
     environment:
       CHECKPOINT_PATH: ${CHECKPOINT_PATH}

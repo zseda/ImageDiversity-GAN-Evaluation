@@ -3,4 +3,5 @@ services:
   studiogan:
     volumes:
       - "/data-fast2/birinci/checkpoints:/app/checkpoints"
+      - "/data-fast2/birinci/data/generated_images:/app/output"
 

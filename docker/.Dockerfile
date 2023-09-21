@@ -8,7 +8,7 @@ WORKDIR /app
 RUN pip install pillow zipfile36 typer pathlib decouple
 
 # Copy your source code to the container
-COPY src/ /app
+# COPY src/ /app
 
 # Define the command to run your script
 CMD ["python", "src/generate.py"]
