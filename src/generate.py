@@ -87,7 +87,10 @@ def log_images_to_wandb(images, num_images, wandb_api_key):
 
 
 if __name__ == "__main__":
+    print(f"Using config file: {CFG_FILE}")
     cfgs = cfg.Configurations(CFG_FILE)
+    print(f"Using config: {cfgs}")
+    print(f"Using model: {cfgs.MODEL}")
     generator = Generator(
         z_dim=512,
         c_dim=10,
