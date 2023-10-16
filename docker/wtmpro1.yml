@@ -2,5 +2,7 @@ version: "2.3"
 services:
   studiogan:
     volumes:
-      - "/data-fast2/birinci/checkpoints:/app/checkpoints"
+      - "/data/1birinci/checkpoints/checkpoints/checkpoints/CIFAR10-StyleGAN2-train-2023_08_03_08_20_49:/app/checkpoints"
+      - "/data/1birinci/datasets/generated_images:/app/output"
+    user: "1013:1015"
 
