@@ -24,6 +24,8 @@ def load_generator(generator, checkpoint_path: Path):
     )  # Load the checkpoint on CUDA if available
     print("Checkpoint loaded successfully. Loading state dict...")
     print(f"Checkpoint keys: {checkpoint.keys()}")
+    print(f"Checkpoint state dict keys: {checkpoint['state_dict'].keys()}")
+    print(f"Generator keys: {generator.state_dict().keys()}")
     generator.load_state_dict(checkpoint["state_dict"])
     generator.eval()
     return generator
