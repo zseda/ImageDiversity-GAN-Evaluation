@@ -1,8 +1,10 @@
 from decouple import config
+from pathlib import Path
 
 CHECKPOINT_PATH = config(
     "CHECKPOINT_PATH",
-    default="/app/checkpoints/model=G-best-weights-step=178000.pth",
+    default=Path("/app/checkpoints/model=G-best-weights-step=178000.pth"),
+    cast=Path,
 )
 NUM_IMAGES = config("NUM_IMAGES", default=50000, cast=int)
 IMAGE_SIZE = config("IMAGE_SIZE", default=32, cast=int)

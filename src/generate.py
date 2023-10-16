@@ -17,10 +17,12 @@ from settings import (
 
 
 # Function to load the generator from a checkpoint
-def load_generator(generator, checkpoint_path):
+def load_generator(generator, checkpoint_path: Path):
+    print(f"Loading generator from checkpoint: {checkpoint_path}")
     checkpoint = torch.load(
-        checkpoint_path, map_location="cuda"
+        checkpoint_path.as_posix(), map_location="cuda"
     )  # Load the checkpoint on CUDA if available
+    print("Checkpoint loaded successfully. Loading state dict...")
     generator.load_state_dict(checkpoint["generator_state_dict"])
     generator.eval()
     return generator
